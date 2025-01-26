@@ -1,0 +1,54 @@
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+
+# Включаем логирование
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Определяем команды
+def start(update: Update, context: CallbackContext) -> None:
+    keyboard = [
+        [InlineKeyboardButton("Лайфхаки для итогового сочинения", callback_data='lifehacks')],
+        [InlineKeyboardButton("Короткие и легкие книги", callback_data='books')],
+        [InlineKeyboardButton("Аудиокниги", callback_data='audiobooks')]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text('Выберите опцию:', reply_markup=reply_markup)
+
+def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+
+    if query.data == 'lifehacks':
+        query.edit_message_text(text="Вот несколько лайфхаков для итогового сочинения:\n"
+                                      "1. Начинайте с плана.\n"
+                                      "2. Используйте примеры из жизни.\n"
+                                      "3. Не забывайте о структуре: введение, основная часть, заключение.")
+    elif query.data == 'books':
+        query.edit_message_text(text="Вот несколько коротких и легких книг:\n"
+                                      "1. "Старик и море" — Эрнест Хемингуэй\n"
+                                      "2. "Маленький принц" — Антуан де Сент-Экзюпери\n"
+                                      "3. "451 градус по Фаренгейту" — Рэй Брэдбери")
+    elif query.data == 'audiobooks':
+        query.edit_message_text(text="Вот несколько аудиокниг:\n"
+                                      "1. "1984" — Джордж Оруэлл (ссылка на аудиофайл)\n"
+                                      "2. "Преступление и наказание" — Федор Достоевский (ссылка на аудиофайл)\n"
+                                      "3. "Гарри Поттер и философский камень" — Дж.К. Роулинг (ссылка на аудиофайл)")
+
+def main() -> None:
+    # Вставьте сюда ваш токен
+    updater = Updater("YOUR_TOKEN")
+
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CallbackQueryHandler(button))
+
+    # Запуск бота
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
